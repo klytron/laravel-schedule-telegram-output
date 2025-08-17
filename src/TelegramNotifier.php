@@ -28,6 +28,8 @@ class TelegramNotifier
         $truncated = false;
         $showUrl = config('schedule-telegram-output.message_format.show_url', false);
         $snippetMaxLength = config('schedule-telegram-output.message_format.snippet_max_length', 500);
+        $includeTimestamp = (bool) config('schedule-telegram-output.message_format.include_timestamp', true);
+        $includeCommandName = (bool) config('schedule-telegram-output.message_format.include_command_name', true);
         // Only send a snippet of the output (first 10 lines or snippetMaxLength chars, whichever is shorter)
         $lines = preg_split('/\r?\n/', $output);
         $snippet = implode("\n", array_slice($lines, 0, 10));
@@ -49,8 +51,14 @@ class TelegramNotifier
                 $contents .= "<b>URL:</b> " . e(config('app.url') ?: 'N/A') . "<br>";
             }
             $contents .= "<b>Server:</b> " . e(gethostname() ?: 'unknown') . "<br>";
-            $contents .= "<b>Command:</b> <code>" . e($commandName) . "</code><br>";
-            $contents .= "<b>Time:</b> " . e(now()->format('Y-m-d H:i:s T')) . "<br><br>";
+            if ($includeCommandName) {
+                $contents .= "<b>Command:</b> <code>" . e($commandName) . "</code><br>";
+            }
+            if ($includeTimestamp) {
+                $contents .= "<b>Time:</b> " . e(now()->format('Y-m-d H:i:s T')) . "<br><br>";
+            } else {
+                $contents .= "<br>";
+            }
             $contents .= "<b>Output:</b><br>" . $outputPre;
         } else {
             $outputClean = str_replace('`', '', $snippet);
@@ -62,9 +70,20 @@ class TelegramNotifier
                 $contents .= "*URL:* " . self::escapeMarkdownV2(config('app.url') ?: 'N/A') . "\n";
             }
             $contents .= "*Server:* " . self::escapeMarkdownV2(gethostname() ?: 'unknown') . "\n";
-            $contents .= "*Command:* `" . self::escapeMarkdownV2($commandName) . "`\n";
-            $contents .= "*Time:* " . self::escapeMarkdownV2(now()->format('Y-m-d H:i:s T')) . "\n\n";
+            if ($includeCommandName) {
+                $contents .= "*Command:* `" . self::escapeMarkdownV2($commandName) . "`\n";
+            }
+            if ($includeTimestamp) {
+                $contents .= "*Time:* " . self::escapeMarkdownV2(now()->format('Y-m-d H:i:s T')) . "\n\n";
+            } else {
+                $contents .= "\n";
+            }
             $contents .= "*Output:*\n" . $outputMd;
+        }
+        // Enforce the maximum message length limit
+        if (strlen($contents) > $maxLength) {
+            $contents = substr($contents, 0, $maxLength - 10) . '...';
+            $truncated = true;
         }
         return [$contents, $truncated];
     }
@@ -80,6 +99,11 @@ class TelegramNotifier
         [$contents, $truncated] = self::formatMessage($output, $commandName, $parseMode, $maxLength);
         $shouldDebug = config('schedule-telegram-output.debug', config('app.debug'));
         $logPayload = config('schedule-telegram-output.log_payload', false);
+
+        if (empty($botToken)) {
+            \Log::error('[ScheduleTelegramOutput] Missing Telegram bot token. Set TELEGRAM_BOT_TOKEN or schedule-telegram-output.bots.default.token.');
+            return;
+        }
 
         // Prepare the payload for the HTTP request
         $payload = [

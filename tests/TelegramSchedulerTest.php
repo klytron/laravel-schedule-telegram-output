@@ -25,8 +25,8 @@ class ScheduleTelegramOutputTest extends TestCase
             'prefix'   => '',
         ]);
 
-        // Setup telegram configuration
-        $app['config']->set('telegram.bots.default.token', 'test-token');
+        // Setup telegram configuration (use the package's config key)
+        $app['config']->set('schedule-telegram-output.bots.default.token', 'test-token');
         $app['config']->set('schedule-telegram-output.default_chat_id', '1234567890');
         $app['config']->set('schedule-telegram-output.message_format.max_length', 4000);
         $app['config']->set('schedule-telegram-output.message_format.parse_mode', 'MarkdownV2');

@@ -33,7 +33,11 @@ A Laravel package to send scheduled job outputs to Telegram with robust formatti
    ```
 
    See [Telegram Setup Guide](docs/TELEGRAM_SETUP.md) for details.
-4. **Basic usage:**
+   
+   Notes:
+   - `SCHEDULE_TELEGRAM_OUTPUT_PARSE_MODE` is read by `config/schedule-telegram-output.php`.
+   - By default only a snippet of output is sent (first 10 lines, up to 500 chars). Configure via `message_format.snippet_max_length`.
+4. **Basic usage (macro-first):**
 
    ```php
    $schedule->command('your:command')->sendOutputToTelegram();
@@ -53,6 +57,11 @@ A Laravel package to send scheduled job outputs to Telegram with robust formatti
 - By default, only a snippet of the output (first 10 lines or up to 500 characters) is sent to Telegram.
 - You can override the snippet length and other options in your config.
 - See the [Configuration Reference](docs/CONFIGURATION.md) for all options and details.
+
+### Advanced (optional)
+
+- The package includes advanced classes (`TelegramEvent`, `TelegramSchedule`, `TelegramScheduleTrait`) for special cases.
+- The recommended approach is using the macro on `Illuminate\Console\Scheduling\Event` as shown above.
 
 ---
 

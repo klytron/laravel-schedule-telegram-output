@@ -37,7 +37,7 @@ class ScheduleTelegramOutputServiceProvider extends ServiceProvider
         // Add macro to Event class to support telegram output
         Event::macro('sendOutputToTelegram', function ($chatId = null) {
             // Always call sendOutputTo to ensure output is captured
-            $this->sendOutputTo(app('path.storage').'/logs/schedule-telegram-'.sha1($this->command).'.log');
+            $this->sendOutputTo(storage_path('logs/schedule-telegram-'.sha1($this->command).'.log'));
 
             $chatId = $chatId ?? config('schedule-telegram-output.default_chat_id');
             if (!$chatId) {

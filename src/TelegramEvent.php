@@ -5,6 +5,15 @@ namespace Klytron\LaravelScheduleTelegramOutput;
 use Illuminate\Console\Scheduling\Event;
 use Klytron\LaravelScheduleTelegramOutput\TelegramNotifier;
 
+/**
+ * Advanced/optional Event subclass.
+ *
+ * Prefer using the macro registered on Illuminate\Console\Scheduling\Event:
+ *   $schedule->command('...')->sendOutputToTelegram();
+ *
+ * This class remains for specialized use-cases and is aligned to the macro's
+ * output file naming for consistency.
+ */
 class TelegramEvent extends Event
 {
     /**
@@ -13,7 +22,8 @@ class TelegramEvent extends Event
     protected function ensureOutputIsBeingCaptured(): void
     {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
-            $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
+            // Match the macro's file naming strategy so both paths are consistent
+            $this->sendOutputTo(storage_path('logs/schedule-telegram-'.sha1($this->command).'.log'));
         }
     }
 
@@ -28,20 +38,19 @@ class TelegramEvent extends Event
     {
         $this->ensureOutputIsBeingCaptured();
 
-        $text = is_file($this->output) ? file_get_contents($this->output) : '';
-
-        if (empty($text)) {
-            return $this;
-        }
-
         // Use provided chat ID or default from config
         $chatId = $chatId ?? config('schedule-telegram-output.default_chat_id');
-        
+
         if (!$chatId) {
             throw new \LogicException('Chat ID is required. Either pass it to sendOutputToTelegram() or set TELEGRAM_DEFAULT_CHAT_ID in your .env file.');
         }
 
-        return $this->then(function () use($chatId, $text) {
+        // Defer reading output until after the event runs
+        return $this->then(function () use ($chatId) {
+            $text = is_file($this->output) ? file_get_contents($this->output) : '';
+            if (empty($text)) {
+                return;
+            }
             $this->sendTelegramMessage($chatId, $text);
         });
     }

@@ -6,8 +6,8 @@ return [
     | Telegram Bot Configuration
     |--------------------------------------------------------------------------
     |
-    | This configuration is used by the telegram event output package.
-    | Make sure you have configured the telegram-bot-sdk package first.
+    | This configuration is used by the schedule telegram output package.
+    | The package communicates with Telegram Bot API directly via HTTP.
     |
     */
 
@@ -55,7 +55,7 @@ return [
     |
     */
     'message_format' => [
-        'parse_mode' => 'MarkdownV2',
+        'parse_mode' => env('SCHEDULE_TELEGRAM_OUTPUT_PARSE_MODE', 'MarkdownV2'),
         'max_length' => 4000,
         'include_timestamp' => true,
         'include_command_name' => true,

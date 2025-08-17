@@ -15,14 +15,7 @@ trait TelegramScheduleTrait
      */
     public function addOutputToTelegram(Event $event, $chatId = null)
     {
-        return $event->then(function () use ($event, $chatId) {
-            $telegramEvent = new TelegramEvent(
-                $event->eventMutex,
-                $event->command,
-                $event->timezone
-            );
-            
-            $telegramEvent->sendOutputToTelegram($chatId);
-        });
+        // Use the macro registered on Illuminate Console Event for consistency
+        return $event->sendOutputToTelegram($chatId);
     }
 } 
