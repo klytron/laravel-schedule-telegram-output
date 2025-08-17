@@ -17,7 +17,7 @@ $schedule->command('your:command')->sendOutputToTelegram('123456789');
 ## 3. Trait-Based Usage
 
 ```php
-use Scryba\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
+use Klytron\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
 
 class Kernel extends ConsoleKernel
 {

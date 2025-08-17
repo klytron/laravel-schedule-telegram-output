@@ -1,5 +1,5 @@
 {
-  "name": "scryba/laravel-schedule-telegram-output",
+  "name": "klytron/laravel-schedule-telegram-output",
   "description": "Laravel package to send scheduled command outputs through Telegram bots",
   "type": "library",
   "license": "MIT",
@@ -18,26 +18,26 @@
   "authors": [
     {
       "name": "Michael K. Laweh",
-      "email": "contact@michael.laweitech.com",
-      "homepage": "https://michael.laweitech.com/",
+      "email": "hi@klytron.com",
+      "homepage": "https://www.klytron.com",
       "role": "Developer"
     }
   ],
-  "homepage": "https://michael.laweitech.com/projects/laravel-schedule-telegram-output",
+  "homepage": "https://github.com/klytron/laravel-schedule-telegram-output",
   "readme": "README.md",
   "support": {
-    "issues": "https://github.com/scryba/laravel-schedule-telegram-output/issues",
-    "source": "https://github.com/scryba/laravel-schedule-telegram-output"
+    "issues": "https://github.com/klytron/laravel-schedule-telegram-output/issues",
+    "source": "https://github.com/klytron/laravel-schedule-telegram-output"
   },
   "funding": [
     {
       "type": "custom",
-      "url": "https://michael.laweitech.com/buy-me-a-coffee"
+      "url": "https://www.klytron.com/buy-me-a-coffee"
     }
   ],
   "autoload": {
     "psr-4": {
-      "Scryba\\LaravelScheduleTelegramOutput\\": "src/"
+      "Klytron\\LaravelScheduleTelegramOutput\\": "src/"
     }
   },
   "require": {
@@ -52,7 +52,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "Scryba\\LaravelScheduleTelegramOutput\\ScheduleTelegramOutputServiceProvider"
+        "Klytron\\LaravelScheduleTelegramOutput\\ScheduleTelegramOutputServiceProvider"
       ]
     }
   },

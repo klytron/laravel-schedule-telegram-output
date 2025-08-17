@@ -1,9 +1,9 @@
 <?php
 
-namespace Scryba\LaravelScheduleTelegramOutput;
+namespace Klytron\LaravelScheduleTelegramOutput;
 
 use Illuminate\Console\Scheduling\Event;
-use Scryba\LaravelScheduleTelegramOutput\TelegramNotifier;
+use Klytron\LaravelScheduleTelegramOutput\TelegramNotifier;
 
 class TelegramEvent extends Event
 {

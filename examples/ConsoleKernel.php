@@ -4,7 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Scryba\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
+use Klytron\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
 
 /**
  * Example Console Kernel showing how to use the Laravel Schedule Telegram Output package

@@ -1,10 +1,10 @@
 <?php
 
-namespace Scryba\LaravelScheduleTelegramOutput\Tests;
+namespace Klytron\LaravelScheduleTelegramOutput\Tests;
 
 use Orchestra\Testbench\TestCase;
 use Illuminate\Console\Scheduling\Schedule;
-use Scryba\LaravelScheduleTelegramOutput\ScheduleTelegramOutputServiceProvider;
+use Klytron\LaravelScheduleTelegramOutput\ScheduleTelegramOutputServiceProvider;
 
 class ScheduleTelegramOutputTest extends TestCase
 {

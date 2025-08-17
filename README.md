@@ -1,9 +1,9 @@
 # Laravel Schedule Telegram Output
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/scryba/laravel-schedule-telegram-output.svg?style=flat-square)](https://packagist.org/packages/scryba/laravel-schedule-telegram-output)
-[![Total Downloads](https://img.shields.io/packagist/dt/scryba/laravel-schedule-telegram-output.svg?style=flat-square)](https://packagist.org/packages/scryba/laravel-schedule-telegram-output)
-[![License](https://img.shields.io/packagist/l/scryba/laravel-schedule-telegram-output.svg?style=flat-square)](https://packagist.org/packages/scryba/laravel-schedule-telegram-output)
-[![GitHub Stars](https://img.shields.io/github/stars/scryba/laravel-schedule-telegram-output?style=flat-square)](https://github.com/scryba/laravel-schedule-telegram-output/stargazers)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/klytron/laravel-schedule-telegram-output.svg?style=flat-square)](https://packagist.org/packages/klytron/laravel-schedule-telegram-output)
+[![Total Downloads](https://img.shields.io/packagist/dt/klytron/laravel-schedule-telegram-output.svg?style=flat-square)](https://packagist.org/packages/klytron/laravel-schedule-telegram-output)
+[![License](https://img.shields.io/packagist/l/klytron/laravel-schedule-telegram-output.svg?style=flat-square)](https://packagist.org/packages/klytron/laravel-schedule-telegram-output)
+[![GitHub Stars](https://img.shields.io/github/stars/klytron/laravel-schedule-telegram-output?style=flat-square)](https://github.com/klytron/laravel-schedule-telegram-output/stargazers)
 
 A Laravel package to send scheduled job outputs to Telegram with robust formatting and flexible configuration.
 
@@ -14,13 +14,13 @@ A Laravel package to send scheduled job outputs to Telegram with robust formatti
 1. **Install:**
 
    ```bash
-   composer require scryba/laravel-schedule-telegram-output
+   composer require klytron/laravel-schedule-telegram-output
    ```
 
 2. **Publish config (optional):**
 
    ```bash
-   php artisan vendor:publish --provider="Scryba\LaravelScheduleTelegramOutput\ScheduleTelegramOutputServiceProvider" --tag=schedule-telegram-output-config
+   php artisan vendor:publish --provider="Klytron\LaravelScheduleTelegramOutput\ScheduleTelegramOutputServiceProvider" --tag=schedule-telegram-output-config
    ```
 
 3. **Configure your `.env`:**
@@ -76,7 +76,7 @@ A Laravel package to send scheduled job outputs to Telegram with robust formatti
 ## ❓ Having issues?
 
 - See [Troubleshooting & FAQ](docs/TROUBLESHOOTING.md)
-- Or open an issue on [GitHub](https://github.com/scryba/laravel-schedule-telegram-output/issues)
+- Or open an issue on [GitHub](https://github.com/klytron/laravel-schedule-telegram-output/issues)
 
 ---
 

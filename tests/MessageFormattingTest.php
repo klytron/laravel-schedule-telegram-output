@@ -1,8 +1,8 @@
 <?php
 
-namespace Scryba\LaravelScheduleTelegramOutput\Tests;
+namespace Klytron\LaravelScheduleTelegramOutput\Tests;
 
-use Scryba\LaravelScheduleTelegramOutput\TelegramNotifier;
+use Klytron\LaravelScheduleTelegramOutput\TelegramNotifier;
 
 class MessageFormattingTest extends TestCase
 {

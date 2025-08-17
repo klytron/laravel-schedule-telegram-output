@@ -1,6 +1,6 @@
 <?php
 
-namespace Scryba\LaravelScheduleTelegramOutput\Tests;
+namespace Klytron\LaravelScheduleTelegramOutput\Tests;
 
 class ErrorHandlingTest extends TestCase
 {

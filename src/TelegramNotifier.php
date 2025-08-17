@@ -1,6 +1,6 @@
 <?php
 
-namespace Scryba\LaravelScheduleTelegramOutput;
+namespace Klytron\LaravelScheduleTelegramOutput;
 
 use Illuminate\Support\Facades\Http;
 

@@ -3,7 +3,7 @@
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
-use Scryba\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
+use Klytron\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
 
 class AdvancedScenarios
 {

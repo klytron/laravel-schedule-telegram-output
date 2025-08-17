@@ -1,6 +1,6 @@
 <?php
 
-namespace Scryba\LaravelScheduleTelegramOutput;
+namespace Klytron\LaravelScheduleTelegramOutput;
 
 trait TelegramConsoleKernel
 {
@@ -20,7 +20,7 @@ trait TelegramConsoleKernel
     /**
      * Get the schedule instance.
      *
-     * @return \Scryba\LaravelScheduleTelegramOutput\TelegramSchedule
+     * @return \Klytron\LaravelScheduleTelegramOutput\TelegramSchedule
      */
     protected function schedule($schedule)
     {

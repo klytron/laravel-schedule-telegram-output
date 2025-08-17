@@ -1,8 +1,8 @@
 <?php
 
-namespace Scryba\LaravelScheduleTelegramOutput\Tests;
+namespace Klytron\LaravelScheduleTelegramOutput\Tests;
 
-use Scryba\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
+use Klytron\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
 use Illuminate\Console\Scheduling\Event;
 
 class TelegramScheduleTraitTest extends TestCase

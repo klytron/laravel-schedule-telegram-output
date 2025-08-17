@@ -7,7 +7,7 @@ This guide covers advanced scenarios for using Laravel Schedule Telegram Output.
 Use the `TelegramScheduleTrait` for programmatic or conditional Telegram output:
 
 ```php
-use Scryba\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
+use Klytron\LaravelScheduleTelegramOutput\TelegramScheduleTrait;
 
 class Kernel extends ConsoleKernel
 {

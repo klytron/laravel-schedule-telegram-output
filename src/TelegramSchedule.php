@@ -1,6 +1,6 @@
 <?php
 
-namespace Scryba\LaravelScheduleTelegramOutput;
+namespace Klytron\LaravelScheduleTelegramOutput;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Container\Container;
@@ -20,7 +20,7 @@ class TelegramSchedule extends Schedule
      *
      * @param  string  $command
      * @param  array  $parameters
-     * @return \Scryba\LaravelScheduleTelegramOutput\TelegramEvent
+     * @return \Klytron\LaravelScheduleTelegramOutput\TelegramEvent
      */
     public function exec($command, array $parameters = [])
     {
@@ -38,7 +38,7 @@ class TelegramSchedule extends Schedule
      *
      * @param  string  $command
      * @param  array  $parameters
-     * @return \Scryba\LaravelScheduleTelegramOutput\TelegramEvent
+     * @return \Klytron\LaravelScheduleTelegramOutput\TelegramEvent
      */
     public function command($command, array $parameters = [])
     {

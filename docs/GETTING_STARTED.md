@@ -7,7 +7,7 @@ Welcome to the Laravel Schedule Telegram Output package! This guide will help yo
 Install the package via Composer:
 
 ```bash
-composer require scryba/laravel-schedule-telegram-output
+composer require klytron/laravel-schedule-telegram-output
 ```
 
 ## 2. Publish the Configuration (Optional)
@@ -15,7 +15,7 @@ composer require scryba/laravel-schedule-telegram-output
 Publish the config file to customize settings:
 
 ```bash
-php artisan vendor:publish --provider="Scryba\LaravelScheduleTelegramOutput\ScheduleTelegramOutputServiceProvider" --tag=schedule-telegram-output-config
+php artisan vendor:publish --provider="Klytron\LaravelScheduleTelegramOutput\ScheduleTelegramOutputServiceProvider" --tag=schedule-telegram-output-config
 ```
 
 ## 3. Configure Your .env

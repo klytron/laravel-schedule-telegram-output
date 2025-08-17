@@ -1,11 +1,11 @@
 <?php
 
-namespace Scryba\LaravelScheduleTelegramOutput;
+namespace Klytron\LaravelScheduleTelegramOutput;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\Event;
-use Scryba\LaravelScheduleTelegramOutput\TelegramNotifier;
+use Klytron\LaravelScheduleTelegramOutput\TelegramNotifier;
 
 class ScheduleTelegramOutputServiceProvider extends ServiceProvider
 {
