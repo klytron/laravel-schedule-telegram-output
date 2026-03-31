@@ -128,21 +128,56 @@ class TelegramNotifier
             ]);
         }
         $apiUrl = "https://api.telegram.org/bot{$botToken}/sendMessage";
-        $response = Http::withHeaders(['Content-Type' => 'application/json'])->post($apiUrl, $payload);
-        if (!$response->successful()) {
-            \Log::error('[ScheduleTelegramOutput] Failed to send Telegram message', [
-                'chat_id' => $chatId,
-                'status' => $response->status(),
-                'body' => $response->body(),
-                'parse_mode' => $parseMode
-            ]);
-        } else if ($shouldDebug) {
-            \Log::info('[ScheduleTelegramOutput] Sent Telegram message chunk (HTTP)', [
-                'chat_id' => $chatId,
-                'length' => strlen($contents),
-                'truncated' => $truncated,
-                'parse_mode' => $parseMode
-            ]);
+        
+        // Configure retry attempts and timeout
+        $maxRetries = config('schedule-telegram-output.retry_attempts', 3);
+        $retryDelay = config('schedule-telegram-output.retry_delay', 1000); // milliseconds
+        $timeout = config('schedule-telegram-output.timeout', 30); // seconds
+        
+        $lastException = null;
+        
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                $response = Http::timeout($timeout)
+                    ->withHeaders(['Content-Type' => 'application/json'])
+                    ->post($apiUrl, $payload);
+                
+                if ($response->successful()) {
+                    if ($shouldDebug) {
+                        \Log::info('[ScheduleTelegramOutput] Sent Telegram message chunk (HTTP)', [
+                            'chat_id' => $chatId,
+                            'length' => strlen($contents),
+                            'truncated' => $truncated,
+                            'parse_mode' => $parseMode,
+                            'attempt' => $attempt
+                        ]);
+                    }
+                    return; // Success, exit the retry loop
+                }
+                
+                // If not successful, throw exception to trigger retry
+                throw new \Exception("HTTP {$response->status()}: " . $response->body());
+                
+            } catch (\Exception $e) {
+                $lastException = $e;
+                
+                if ($attempt < $maxRetries) {
+                    if ($shouldDebug) {
+                        \Log::warning("[ScheduleTelegramOutput] Attempt {$attempt} failed, retrying...", [
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                    // Exponential backoff: wait longer between retries
+                    usleep($retryDelay * $attempt * 1000);
+                }
+            }
         }
+        
+        // All retries exhausted
+        \Log::error('[ScheduleTelegramOutput] Failed to send Telegram message after ' . $maxRetries . ' attempts', [
+            'chat_id' => $chatId,
+            'last_error' => $lastException ? $lastException->getMessage() : 'Unknown error',
+            'parse_mode' => $parseMode
+        ]);
     }
 } 

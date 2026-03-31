@@ -30,6 +30,11 @@ A Laravel package to send scheduled job outputs to Telegram with robust formatti
    TELEGRAM_DEFAULT_CHAT_ID=your-chat-id
    SCHEDULE_TELEGRAM_OUTPUT_DEBUG=true # or false
    SCHEDULE_TELEGRAM_OUTPUT_PARSE_MODE=MarkdownV2 # or HTML
+   
+   # Retry configuration (optional)
+   SCHEDULE_TELEGRAM_OUTPUT_RETRY_ATTEMPTS=3
+   SCHEDULE_TELEGRAM_OUTPUT_RETRY_DELAY=1000
+   SCHEDULE_TELEGRAM_OUTPUT_TIMEOUT=30
    ```
 
    See [Telegram Setup Guide](docs/TELEGRAM_SETUP.md) for details.

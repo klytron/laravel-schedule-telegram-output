@@ -66,4 +66,16 @@ return [
     ],
     // Log the escaped message and HTTP payload (default: app.debug)
     'log_payload' => env('SCHEDULE_TELEGRAM_OUTPUT_LOG_PAYLOAD', env('APP_DEBUG', false)),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Retry Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure retry behavior for failed Telegram API requests.
+    |
+    */
+    'retry_attempts' => env('SCHEDULE_TELEGRAM_OUTPUT_RETRY_ATTEMPTS', 3),
+    'retry_delay' => env('SCHEDULE_TELEGRAM_OUTPUT_RETRY_DELAY', 1000), // milliseconds
+    'timeout' => env('SCHEDULE_TELEGRAM_OUTPUT_TIMEOUT', 30), // seconds
 ]; 

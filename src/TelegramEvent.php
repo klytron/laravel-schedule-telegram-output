@@ -47,7 +47,14 @@ class TelegramEvent extends Event
 
         // Defer reading output until after the event runs
         return $this->then(function () use ($chatId) {
-            $text = is_file($this->output) ? file_get_contents($this->output) : '';
+            $text = '';
+            if (is_file($this->output) && is_readable($this->output)) {
+                $text = @file_get_contents($this->output);
+                if ($text === false) {
+                    \Log::warning('[ScheduleTelegramOutput] Failed to read output file', ['output' => $this->output]);
+                    $text = '';
+                }
+            }
             if (empty($text)) {
                 return;
             }
