@@ -1,7 +1,6 @@
 {
   "name": "klytron/laravel-schedule-telegram-output",
   "description": "Laravel package to send scheduled command outputs through Telegram bots (supports Laravel 10-13)",
-  "version": "1.1.0",
   "type": "library",
   "license": "MIT",
   "keywords": [
