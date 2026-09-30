@@ -5,7 +5,19 @@
 [![License](https://img.shields.io/packagist/l/klytron/laravel-schedule-telegram-output.svg?style=flat-square)](https://packagist.org/packages/klytron/laravel-schedule-telegram-output)
 [![GitHub Stars](https://img.shields.io/github/stars/klytron/laravel-schedule-telegram-output?style=flat-square)](https://github.com/klytron/laravel-schedule-telegram-output/stargazers)
 
-A Laravel package to send scheduled job outputs to Telegram with robust formatting and flexible configuration.
+A Laravel package to send scheduled job outputs to Telegram with robust formatting, execution duration and exit code metrics, and flexible configuration.
+
+---
+
+## ✨ Features
+
+- 📢 **Instant Notifications**: Send scheduled console output directly to Telegram channels, groups, or DMs
+- ⏱️ **Execution Metrics**: Every notification includes command execution duration and exit code status
+- 🛡️ **Dev & CI Safe (Graceful Degradation)**: Silently no-ops in local development or CI if credentials are not configured, preventing unexpected scheduler crashes
+- 🎯 **Macro-First Ergonomics**: Works directly on native `$schedule->command(...)->sendOutputToTelegram()`
+- 🧼 **Robust Escaping**: Bulletproof MarkdownV2 escaping and HTML formatting preventing Telegram API parse errors
+- 🔄 **Chunking & Retries**: Automatically chunks long outputs and retries transient network errors
+- 🚀 **Multi-Laravel Support**: Fully compatible with Laravel 10.x, 11.x, 12.x, and 13.x
 
 ---
 
@@ -28,9 +40,14 @@ A Laravel package to send scheduled job outputs to Telegram with robust formatti
    ```env
    TELEGRAM_BOT_TOKEN=your-telegram-bot-token
    TELEGRAM_DEFAULT_CHAT_ID=your-chat-id
-   SCHEDULE_TELEGRAM_OUTPUT_DEBUG=true # or false
+   SCHEDULE_TELEGRAM_OUTPUT_DEBUG=false
    SCHEDULE_TELEGRAM_OUTPUT_PARSE_MODE=MarkdownV2 # or HTML
    
+   # Dev / CI Behavior (optional)
+   # When false (default), missing credentials safely no-op without failing schedule:run
+   # Set to true to throw a LogicException if credentials are missing
+   SCHEDULE_TELEGRAM_OUTPUT_STRICT_MODE=false
+
    # Retry configuration (optional)
    SCHEDULE_TELEGRAM_OUTPUT_RETRY_ATTEMPTS=3
    SCHEDULE_TELEGRAM_OUTPUT_RETRY_DELAY=1000

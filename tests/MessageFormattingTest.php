@@ -72,4 +72,34 @@ class MessageFormattingTest extends TestCase
         // No double escaping
         $this->assertStringNotContainsString('\\\.', $escaped);
     }
+
+    /** @test */
+    public function it_formats_metadata_footer_in_markdownv2()
+    {
+        $output = "Job completed successfully";
+        $command = "reports:generate";
+        $metadata = [
+            'exit_code' => 0,
+            'duration' => '1.25s',
+        ];
+
+        $messages = TelegramNotifier::formatMessage($output, $command, 'MarkdownV2', 4000, $metadata);
+        $this->assertNotEmpty($messages);
+        $this->assertStringContainsString('*Summary:* `Exit Code: 0 \| Duration: 1\.25s`', $messages[0]);
+    }
+
+    /** @test */
+    public function it_formats_metadata_footer_in_html()
+    {
+        $output = "Job completed successfully";
+        $command = "reports:generate";
+        $metadata = [
+            'exit_code' => 1,
+            'duration' => '3.50s',
+        ];
+
+        $messages = TelegramNotifier::formatMessage($output, $command, 'html', 4000, $metadata);
+        $this->assertNotEmpty($messages);
+        $this->assertStringContainsString('<b>Summary:</b> <code>Exit Code: 1 | Duration: 3.50s</code>', $messages[0]);
+    }
 } 

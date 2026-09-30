@@ -36,15 +36,29 @@ class ScheduleTelegramOutputServiceProvider extends ServiceProvider
 
         // Add macro to Event class to support telegram output
         Event::macro('sendOutputToTelegram', function ($chatId = null) {
+            $startTime = microtime(true);
+
             // Always call sendOutputTo to ensure output is captured
             $this->sendOutputTo(storage_path('logs/schedule-telegram-'.sha1($this->command).'.log'));
 
-            $chatId = $chatId ?? config('schedule-telegram-output.default_chat_id');
-            if (!$chatId) {
-                throw new \LogicException('Chat ID is required. Either pass it to sendOutputToTelegram() or set TELEGRAM_DEFAULT_CHAT_ID in your .env file.');
+            $resolvedChatId = $chatId ?? config('schedule-telegram-output.default_chat_id');
+            $botToken = config('schedule-telegram-output.bots.default.token');
+
+            // If credentials are not configured, allow graceful no-op in dev/CI unless strict mode is enabled
+            if (empty($resolvedChatId) || empty($botToken)) {
+                if (config('schedule-telegram-output.strict_mode', false)) {
+                    throw new \LogicException('Telegram credentials missing. Set TELEGRAM_BOT_TOKEN and TELEGRAM_DEFAULT_CHAT_ID or pass chatId.');
+                }
+
+                if (config('schedule-telegram-output.debug', config('app.debug', false))) {
+                    \Log::debug('[ScheduleTelegramOutput] sendOutputToTelegram skipped: Missing bot token or chat ID.');
+                }
+
+                return $this;
             }
 
-            return $this->then(function () use ($chatId) {
+            return $this->then(function () use ($resolvedChatId, $startTime) {
+                $duration = round(microtime(true) - $startTime, 2);
                 $output = is_file($this->output) ? file_get_contents($this->output) : '';
                 if (empty($output)) {
                     return;
@@ -56,10 +70,15 @@ class ScheduleTelegramOutputServiceProvider extends ServiceProvider
                         $parts = explode(' ', $commandName);
                         $commandName = end($parts); // Get the last part (the actual command)
                     }
+
+                    $metadata = [
+                        'duration' => "{$duration}s",
+                        'exit_code' => $this->exitCode ?? null,
+                    ];
                     
-                    TelegramNotifier::sendMessage($chatId, $output, $commandName);
+                    TelegramNotifier::sendMessage($resolvedChatId, $output, $commandName, $metadata);
                     return;
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     \Log::error('Failed to send Telegram message: ' . $e->getMessage());
                 }
             });

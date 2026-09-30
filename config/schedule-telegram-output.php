@@ -78,4 +78,16 @@ return [
     'retry_attempts' => env('SCHEDULE_TELEGRAM_OUTPUT_RETRY_ATTEMPTS', 3),
     'retry_delay' => env('SCHEDULE_TELEGRAM_OUTPUT_RETRY_DELAY', 1000), // milliseconds
     'timeout' => env('SCHEDULE_TELEGRAM_OUTPUT_TIMEOUT', 30), // seconds
+
+    /*
+    |--------------------------------------------------------------------------
+    | Strict Mode
+    |--------------------------------------------------------------------------
+    |
+    | When true, missing Telegram credentials will throw a LogicException during
+    | schedule definition. When false (default), missing credentials gracefully
+    | no-op to prevent crashing artisan commands in local dev or CI.
+    |
+    */
+    'strict_mode' => env('SCHEDULE_TELEGRAM_OUTPUT_STRICT_MODE', false),
 ]; 

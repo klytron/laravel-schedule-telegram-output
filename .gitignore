@@ -12,3 +12,6 @@ yarn-error.log
 *.log
 .DS_Store
 Thumbs.db
+composer.lock
+.ddev/
+

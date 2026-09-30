@@ -23,7 +23,7 @@ class TelegramNotifier
     /**
      * Format the message for Telegram (MarkdownV2 or HTML)
      */
-    public static function formatMessage($output, $commandName, $parseMode, $maxLength)
+    public static function formatMessage($output, $commandName, $parseMode, $maxLength, array $metadata = [])
     {
         $truncated = false;
         $showUrl = config('schedule-telegram-output.message_format.show_url', false);
@@ -40,6 +40,17 @@ class TelegramNotifier
             $snippet .= "\n...\n[Output truncated: showing only a snippet]";
             $truncated = true;
         }
+
+        // Build footer summary (exit code, duration) if provided
+        $footerParts = [];
+        if (isset($metadata['exit_code']) && $metadata['exit_code'] !== null) {
+            $footerParts[] = "Exit Code: {$metadata['exit_code']}";
+        }
+        if (!empty($metadata['duration'])) {
+            $footerParts[] = "Duration: {$metadata['duration']}";
+        }
+        $footerSummary = !empty($footerParts) ? implode(' | ', $footerParts) : null;
+
         if (strtolower($parseMode) === 'html') {
             $outputClean = str_replace('`', '', $snippet);
             $outputHtml = e($outputClean);
@@ -60,6 +71,9 @@ class TelegramNotifier
                 $contents .= "<br>";
             }
             $contents .= "<b>Output:</b><br>" . $outputPre;
+            if ($footerSummary) {
+                $contents .= "<br><br><b>Summary:</b> <code>" . e($footerSummary) . "</code>";
+            }
         } else {
             $outputClean = str_replace('`', '', $snippet);
             $outputMd = self::escapeMarkdownV2($outputClean);
@@ -79,6 +93,9 @@ class TelegramNotifier
                 $contents .= "\n";
             }
             $contents .= "*Output:*\n" . $outputMd;
+            if ($footerSummary) {
+                $contents .= "\n\n*Summary:* `" . self::escapeMarkdownV2($footerSummary) . "`";
+            }
         }
         // Enforce the maximum message length limit
         if (strlen($contents) > $maxLength) {
@@ -91,12 +108,12 @@ class TelegramNotifier
     /**
      * Send a message to Telegram
      */
-    public static function sendMessage($chatId, $output, $commandName)
+    public static function sendMessage($chatId, $output, $commandName, array $metadata = [])
     {
         $maxLength = config('schedule-telegram-output.message_format.max_length', 4000);
         $parseMode = config('schedule-telegram-output.message_format.parse_mode', 'MarkdownV2');
         $botToken = config('schedule-telegram-output.bots.default.token');
-        [$contents, $truncated] = self::formatMessage($output, $commandName, $parseMode, $maxLength);
+        [$contents, $truncated] = self::formatMessage($output, $commandName, $parseMode, $maxLength, $metadata);
         $shouldDebug = config('schedule-telegram-output.debug', config('app.debug'));
         $logPayload = config('schedule-telegram-output.log_payload', false);
 

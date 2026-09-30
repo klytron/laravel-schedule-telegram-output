@@ -2,6 +2,9 @@
 
 namespace Klytron\LaravelScheduleTelegramOutput;
 
+/**
+ * @deprecated Since v1.3.0, to be removed in v2.0.0. Use the native `->sendOutputToTelegram()` macro on Laravel's Schedule/Event instead.
+ */
 trait TelegramConsoleKernel
 {
     /**
