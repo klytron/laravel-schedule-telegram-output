@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Placeholder-credential detection: obvious placeholder token/chat ID values (`dummy`, `placeholder`, `example`, `your-telegram-bot-token`, ...) are treated the same as missing credentials (graceful no-op, or `LogicException` in `strict_mode`).
+- `enabled` configuration option (`SCHEDULE_TELEGRAM_OUTPUT_ENABLED`, default `true`) as a hard kill switch — checked before anything else, always wins over `strict_mode`.
+- Single-line signature report footer (`▶ php artisan cmd — exit code — duration — env`), always rendered, with configurable `environment_label` (`SCHEDULE_TELEGRAM_OUTPUT_ENV_LABEL`, defaults to `APP_ENV`).
+- `max_total_time` configuration option (`SCHEDULE_TELEGRAM_OUTPUT_MAX_TOTAL_TIME`, default `60` seconds) as a global runtime cap per report — a Telegram outage can never extend a scheduled task's runtime beyond it.
+- `fail_hard` opt-in configuration (`SCHEDULE_TELEGRAM_OUTPUT_FAIL_HARD`, default `false`): when `true`, a `RuntimeException` is thrown after retries are exhausted so the task itself fails (default still fails the *report*, not the task).
+- Timeout/retry defaults table duplicated into `README.md` so the semantics always ship inside the Composer dist package (`docs/` is export-ignored).
+
+### Changed
+- Legacy `TelegramEvent::sendOutputToTelegram()` path now mirrors the macro's graceful no-op behavior (missing/placeholder credentials, kill switch, `strict_mode`) and passes exit code/duration/signature metadata so legacy reports get footers too.
+
+## [1.3.0] - 2026-10-01
+
+### Added
 - Graceful no-op mode when `TELEGRAM_BOT_TOKEN` or `TELEGRAM_DEFAULT_CHAT_ID` are missing, preventing console artisan command crashes in testing and local development.
 - `strict_mode` configuration option (`SCHEDULE_TELEGRAM_OUTPUT_STRICT_MODE`) to re-enable strict exception throwing if desired.
 - Report footer metadata including command execution duration and exit code (`Exit Code: 0 | Duration: 1.24s`).

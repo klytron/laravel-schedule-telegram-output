@@ -3,6 +3,7 @@
 namespace Klytron\LaravelScheduleTelegramOutput;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\Event;
 use Klytron\LaravelScheduleTelegramOutput\TelegramNotifier;
@@ -41,17 +42,27 @@ class ScheduleTelegramOutputServiceProvider extends ServiceProvider
             // Always call sendOutputTo to ensure output is captured
             $this->sendOutputTo(storage_path('logs/schedule-telegram-'.sha1($this->command).'.log'));
 
+            // Hard kill switch: checked before anything else, always wins over strict_mode.
+            if (!TelegramNotifier::isEnabled()) {
+                if (config('schedule-telegram-output.debug', config('app.debug', false))) {
+                    Log::debug('[ScheduleTelegramOutput] telegram output disabled: no credentials');
+                }
+
+                return $this;
+            }
+
             $resolvedChatId = $chatId ?? config('schedule-telegram-output.default_chat_id');
             $botToken = config('schedule-telegram-output.bots.default.token');
 
-            // If credentials are not configured, allow graceful no-op in dev/CI unless strict mode is enabled
-            if (empty($resolvedChatId) || empty($botToken)) {
+            // If credentials are missing or placeholders, allow graceful no-op
+            // in dev/CI unless strict mode is enabled
+            if (TelegramNotifier::isMissingOrPlaceholder($resolvedChatId) || TelegramNotifier::isMissingOrPlaceholder($botToken)) {
                 if (config('schedule-telegram-output.strict_mode', false)) {
                     throw new \LogicException('Telegram credentials missing. Set TELEGRAM_BOT_TOKEN and TELEGRAM_DEFAULT_CHAT_ID or pass chatId.');
                 }
 
                 if (config('schedule-telegram-output.debug', config('app.debug', false))) {
-                    \Log::debug('[ScheduleTelegramOutput] sendOutputToTelegram skipped: Missing bot token or chat ID.');
+                    Log::debug('[ScheduleTelegramOutput] telegram output disabled: no credentials');
                 }
 
                 return $this;
@@ -72,14 +83,19 @@ class ScheduleTelegramOutputServiceProvider extends ServiceProvider
                     }
 
                     $metadata = [
+                        'signature' => "php artisan {$commandName}",
                         'duration' => "{$duration}s",
                         'exit_code' => $this->exitCode ?? null,
                     ];
-                    
+
                     TelegramNotifier::sendMessage($resolvedChatId, $output, $commandName, $metadata);
                     return;
                 } catch (\Throwable $e) {
-                    \Log::error('Failed to send Telegram message: ' . $e->getMessage());
+                    if (TelegramNotifier::shouldFailHard()) {
+                        throw $e;
+                    }
+
+                    Log::error('Failed to send Telegram message: ' . $e->getMessage());
                 }
             });
         });

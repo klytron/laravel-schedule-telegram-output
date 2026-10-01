@@ -2,5 +2,9 @@ parameters:
   level: 5
   paths:
     - src
-  autoload_files:
-    - vendor/autoload.php 
+  bootstrapFiles:
+    - vendor/autoload.php
+  # Deprecated BC-layer traits are part of the public API (used by consumers
+  # and covered in tests) but never used inside src/ itself.
+  ignoreErrors:
+    - identifier: trait.unused

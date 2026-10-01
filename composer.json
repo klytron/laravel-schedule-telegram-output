@@ -40,6 +40,11 @@
       "Klytron\\LaravelScheduleTelegramOutput\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Klytron\\LaravelScheduleTelegramOutput\\Tests\\": "tests/"
+    }
+  },
   "require": {
     "php": "^8.2",
     "illuminate/support": "^10.0|^11.0|^12.0|^13.0",

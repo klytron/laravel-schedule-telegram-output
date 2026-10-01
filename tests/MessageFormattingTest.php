@@ -41,8 +41,8 @@ class MessageFormattingTest extends TestCase
         $this->assertStringContainsString('my\.file\.txt', $escaped);
         $this->assertStringContainsString('\!', $escaped);
         // No double escaping
-        $this->assertStringNotContainsString('\\\.', $escaped);
-        $this->assertStringNotContainsString('\\!', $escaped);
+        $this->assertStringNotContainsString('\\\\.', $escaped);
+        $this->assertStringNotContainsString('\\\\!', $escaped);
     }
 
     /** @test */
@@ -50,6 +50,8 @@ class MessageFormattingTest extends TestCase
     {
         $project = 'picture-gallery-adx-redirector';
         $env = 'production';
+        config()->set('app.name', $project);
+        config()->set('app.env', $env);
         $output = "Processing file: my.file.txt\nURL: https://example.com/path.to/file\nDone.";
         $command = 'app:process-uploaded-csv';
         $message = TelegramNotifier::formatMessage($output, $command, 'MarkdownV2', 4000)[0];
@@ -85,7 +87,8 @@ class MessageFormattingTest extends TestCase
 
         $messages = TelegramNotifier::formatMessage($output, $command, 'MarkdownV2', 4000, $metadata);
         $this->assertNotEmpty($messages);
-        $this->assertStringContainsString('*Summary:* `Exit Code: 0 \| Duration: 1\.25s`', $messages[0]);
+        // Single-line signature footer: signature — exit code — duration — env
+        $this->assertStringContainsString("\u{25B6} php artisan reports:generate \u{2014} exit 0 \u{2014} 1\.25s", $messages[0]);
     }
 
     /** @test */
@@ -100,6 +103,30 @@ class MessageFormattingTest extends TestCase
 
         $messages = TelegramNotifier::formatMessage($output, $command, 'html', 4000, $metadata);
         $this->assertNotEmpty($messages);
-        $this->assertStringContainsString('<b>Summary:</b> <code>Exit Code: 1 | Duration: 3.50s</code>', $messages[0]);
+        $this->assertStringContainsString("\u{25B6} php artisan reports:generate \u{2014} exit 1 \u{2014} 3.50s", $messages[0]);
+    }
+
+    /** @test */
+    public function it_always_includes_signature_footer_even_without_metadata()
+    {
+        config()->set('app.env', 'production');
+
+        [$contents] = TelegramNotifier::formatMessage("done", 'app:demo', 'MarkdownV2', 4000);
+        $this->assertStringContainsString("\u{25B6} php artisan app:demo", $contents);
+        $this->assertStringContainsString("production", $contents);
+    }
+
+    /** @test */
+    public function it_uses_custom_signature_and_env_label_in_footer()
+    {
+        $metadata = [
+            'signature' => 'php artisan app:process-uploads',
+            'exit_code' => 1,
+            'duration' => '42s',
+            'env' => 'prod',
+        ];
+
+        [$contents] = TelegramNotifier::formatMessage("boom", 'app:process-uploads', 'MarkdownV2', 4000, $metadata);
+        $this->assertStringContainsString("\u{25B6} php artisan app:process\-uploads \u{2014} exit 1 \u{2014} 42s \u{2014} prod", $contents);
     }
 } 

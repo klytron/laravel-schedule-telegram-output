@@ -2,21 +2,14 @@
 
 namespace Klytron\LaravelScheduleTelegramOutput\Tests;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Console\Scheduling\Schedule;
-use Klytron\LaravelScheduleTelegramOutput\ScheduleTelegramOutputServiceProvider;
 
-class ScheduleTelegramOutputTest extends TestCase
+class TelegramSchedulerTest extends TestCase
 {
-    protected function getPackageProviders($app)
-    {
-        return [
-            ScheduleTelegramOutputServiceProvider::class,
-        ];
-    }
-
     protected function getEnvironmentSetUp($app)
     {
+        parent::getEnvironmentSetUp($app);
+
         // Setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
@@ -49,4 +42,4 @@ class ScheduleTelegramOutputTest extends TestCase
     {
         $this->assertTrue(\Illuminate\Console\Scheduling\Event::hasMacro('sendOutputToTelegram'));
     }
-} 
+}

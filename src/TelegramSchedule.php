@@ -3,7 +3,6 @@
 namespace Klytron\LaravelScheduleTelegramOutput;
 
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Container\Container;
 
 /**
  * @deprecated Since v1.3.0, to be removed in v2.0.0. Use the native `->sendOutputToTelegram()` macro on Laravel's Schedule/Event instead.
@@ -12,10 +11,12 @@ class TelegramSchedule extends Schedule
 {
     /**
      * Create a new schedule instance.
+     *
+     * @param \DateTimeZone|string|null $timezone
      */
-    public function __construct(?Container $container = null)
+    public function __construct($timezone = null)
     {
-        parent::__construct($container);
+        parent::__construct($timezone);
     }
 
     /**

@@ -77,9 +77,9 @@ class HttpSendMessageTest extends TestCase
             'schedule-telegram-output.bots.default.token' => 'test-token',
             'schedule-telegram-output.default_chat_id' => '777777',
             'schedule-telegram-output.message_format.parse_mode' => 'MarkdownV2',
-            // Force very small snippet and overall max length
+            // Force very small snippet; keep max length large so the marker survives
             'schedule-telegram-output.message_format.snippet_max_length' => 20,
-            'schedule-telegram-output.message_format.max_length' => 120,
+            'schedule-telegram-output.message_format.max_length' => 4000,
         ]);
 
         Http::fake([
@@ -95,8 +95,35 @@ class HttpSendMessageTest extends TestCase
             return $request->url() === 'https://api.telegram.org/bottest-token/sendMessage'
                 && ($json['chat_id'] ?? null) === '777777'
                 && ($json['parse_mode'] ?? null) === 'MarkdownV2'
-                && strlen($text) <= 120
-                && str_contains($text, '[Output truncated: showing only a snippet]');
+                && strlen($text) <= 4000
+                && str_contains($text, '\[Output truncated: showing only a snippet\]');
+        });
+    }
+
+    /** @test */
+    public function it_enforces_max_length_on_long_messages()
+    {
+        config([
+            'schedule-telegram-output.bots.default.token' => 'test-token',
+            'schedule-telegram-output.default_chat_id' => '777777',
+            'schedule-telegram-output.message_format.parse_mode' => 'MarkdownV2',
+            'schedule-telegram-output.message_format.snippet_max_length' => 500,
+            'schedule-telegram-output.message_format.max_length' => 200,
+        ]);
+
+        Http::fake([
+            'https://api.telegram.org/*' => Http::response(['ok' => true], 200),
+        ]);
+
+        $longOutput = implode("\n", array_map(fn($i) => "Line $i: Lorem ipsum dolor sit amet.", range(1, 50)));
+        TelegramNotifier::sendMessage('777777', $longOutput, 'app:truncate-demo');
+
+        Http::assertSent(function (Request $request) {
+            $json = $request->data();
+            $text = (string) ($json['text'] ?? '');
+            return $request->url() === 'https://api.telegram.org/bottest-token/sendMessage'
+                && strlen($text) <= 200
+                && str_ends_with($text, '...');
         });
     }
 }

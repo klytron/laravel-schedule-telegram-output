@@ -12,11 +12,11 @@ A Laravel package to send scheduled job outputs to Telegram with robust formatti
 ## ✨ Features
 
 - 📢 **Instant Notifications**: Send scheduled console output directly to Telegram channels, groups, or DMs
-- ⏱️ **Execution Metrics**: Every notification includes command execution duration and exit code status
-- 🛡️ **Dev & CI Safe (Graceful Degradation)**: Silently no-ops in local development or CI if credentials are not configured, preventing unexpected scheduler crashes
+- ⏱️ **Execution Metrics**: Every notification ends with a single-line signature footer (`▶ php artisan cmd — exit code — duration — env`)
+- 🛡️ **Dev & CI Safe (Graceful Degradation)**: Silently no-ops in local development or CI if credentials are missing, placeholders (`dummy`, `...`), or when `SCHEDULE_TELEGRAM_OUTPUT_ENABLED=false`, preventing unexpected scheduler crashes
 - 🎯 **Macro-First Ergonomics**: Works directly on native `$schedule->command(...)->sendOutputToTelegram()`
 - 🧼 **Robust Escaping**: Bulletproof MarkdownV2 escaping and HTML formatting preventing Telegram API parse errors
-- 🔄 **Chunking & Retries**: Automatically chunks long outputs and retries transient network errors
+- 🔄 **Chunking & Retries**: Automatically chunks long outputs and retries transient network errors within a global runtime cap (fail-the-report-not-the-task by default, opt-in fail-hard)
 - 🚀 **Multi-Laravel Support**: Fully compatible with Laravel 10.x, 11.x, 12.x, and 13.x
 
 ---
@@ -42,16 +42,28 @@ A Laravel package to send scheduled job outputs to Telegram with robust formatti
    TELEGRAM_DEFAULT_CHAT_ID=your-chat-id
    SCHEDULE_TELEGRAM_OUTPUT_DEBUG=false
    SCHEDULE_TELEGRAM_OUTPUT_PARSE_MODE=MarkdownV2 # or HTML
-   
+
+   # Master kill switch (optional, default: true)
+   # When false, all Telegram sending is skipped silently — checked before
+   # anything else, so it always wins over strict mode.
+   SCHEDULE_TELEGRAM_OUTPUT_ENABLED=true
+
    # Dev / CI Behavior (optional)
    # When false (default), missing credentials safely no-op without failing schedule:run
+   # Placeholder values (dummy, placeholder, example, your-telegram-bot-token, ...)
+   # are treated the same as missing credentials.
    # Set to true to throw a LogicException if credentials are missing
    SCHEDULE_TELEGRAM_OUTPUT_STRICT_MODE=false
 
-   # Retry configuration (optional)
+   # Retry configuration (optional, see "Timeout, retries & failure mode" below)
    SCHEDULE_TELEGRAM_OUTPUT_RETRY_ATTEMPTS=3
    SCHEDULE_TELEGRAM_OUTPUT_RETRY_DELAY=1000
    SCHEDULE_TELEGRAM_OUTPUT_TIMEOUT=30
+   SCHEDULE_TELEGRAM_OUTPUT_MAX_TOTAL_TIME=60
+   SCHEDULE_TELEGRAM_OUTPUT_FAIL_HARD=false
+
+   # Short environment label used in the report footer (optional, default: APP_ENV)
+   SCHEDULE_TELEGRAM_OUTPUT_ENV_LABEL=prod
    ```
 
    See [Telegram Setup Guide](docs/TELEGRAM_SETUP.md) for details.
@@ -84,6 +96,32 @@ A Laravel package to send scheduled job outputs to Telegram with robust formatti
 
 - The package includes advanced classes (`TelegramEvent`, `TelegramSchedule`, `TelegramScheduleTrait`) for special cases.
 - The recommended approach is using the macro on `Illuminate\Console\Scheduling\Event` as shown above.
+
+---
+
+## ⏱️ Timeout, retries & failure mode
+
+Every report ends with a single-line signature footer carrying identity/result metadata:
+
+```
+▶ php artisan app:process-uploads — exit 1 — 42s — prod
+```
+
+(signature, exit code, duration, environment label from `SCHEDULE_TELEGRAM_OUTPUT_ENV_LABEL` or `APP_ENV`).
+
+HTTP behavior for Telegram API calls (all configurable via `config/schedule-telegram-output.php`):
+
+| Option | Env var | Default | Meaning |
+|---|---|---|---|
+| `timeout` | `SCHEDULE_TELEGRAM_OUTPUT_TIMEOUT` | `30` | Per-request HTTP timeout, in seconds. Shrunk automatically when less budget remains. |
+| `retry_attempts` | `SCHEDULE_TELEGRAM_OUTPUT_RETRY_ATTEMPTS` | `3` | Max HTTP attempts per report. |
+| `retry_delay` | `SCHEDULE_TELEGRAM_OUTPUT_RETRY_DELAY` | `1000` | Base delay between attempts, in milliseconds, with linear backoff (`delay × attempt`). Capped by the remaining budget. |
+| `max_total_time` | `SCHEDULE_TELEGRAM_OUTPUT_MAX_TOTAL_TIME` | `60` | Global runtime cap per report, in seconds. A Telegram outage can never extend a scheduled task's runtime beyond this budget (retries + backoff included). |
+| `fail_hard` | `SCHEDULE_TELEGRAM_OUTPUT_FAIL_HARD` | `false` | When `false` (default), a failed report is logged and the task continues (fail the *report*, not the task). When `true`, a `RuntimeException` is thrown after retries are exhausted so the task itself fails. |
+
+> Note: the full guides live in `docs/` (excluded from the Composer dist package via
+> `.gitattributes`); this table is duplicated here in the README so the defaults
+> always ship with the distribution.
 
 ---
 
